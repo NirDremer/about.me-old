@@ -1,0 +1,14 @@
+# GitHub Pages configuration
+include:
+  - .nojekyll
+  - .htaccess
+
+plugins:
+  - jekyll-redirect-from
+
+# Ensure proper MIME types
+defaults:
+  - scope:
+      path: "assets"
+    values:
+      layout: null

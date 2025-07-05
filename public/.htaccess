@@ -1,0 +1,4 @@
+# Fix MIME types for GitHub Pages
+AddType application/javascript .js
+AddType text/css .css
+AddType application/json .json
