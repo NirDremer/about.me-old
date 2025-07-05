@@ -94,26 +94,37 @@ const formatTime = (date: Date): string => {
   });
 };
 
-// Load photo manifest
-const loadPhotoManifest = async (): Promise<string[]> => {
+// Load photo manifest with better error handling
+const loadPhotoManifest = async (): Promise<{ photos: string[], success: boolean }> => {
   try {
+    console.log('Loading photo manifest...');
     const response = await fetch('/photos/manifest.json');
     if (!response.ok) {
-      return [];
+      console.warn('Failed to load manifest:', response.status, response.statusText);
+      return { photos: [], success: false };
     }
     const manifest = await response.json();
-    return manifest.photos || [];
+    console.log('Loaded manifest:', manifest);
+    return { photos: manifest.photos || [], success: true };
   } catch (error) {
     console.error('Error loading photo manifest:', error);
-    return [];
+    return { photos: [], success: false };
   }
 };
 
 // Get list of photo files from manifest
 const getPhotoFiles = async (): Promise<string[]> => {
   try {
-    const manifestPhotos = await loadPhotoManifest();
-    return manifestPhotos.filter(filename => isImageFile(filename));
+    const { photos: manifestPhotos, success } = await loadPhotoManifest();
+    
+    if (!success) {
+      console.log('Manifest loading failed, returning empty array');
+      return [];
+    }
+    
+    const imageFiles = manifestPhotos.filter(filename => isImageFile(filename));
+    console.log('Filtered image files:', imageFiles);
+    return imageFiles;
   } catch (error) {
     console.error('Error loading photos from manifest:', error);
     return [];
@@ -126,11 +137,11 @@ export const loadPhotosFromRepo = async (): Promise<Photo[]> => {
     const photoFiles = await getPhotoFiles();
     
     if (photoFiles.length === 0) {
-      console.log('No photos found in /photos/ directory.');
+      console.log('No photos found in manifest or manifest is empty.');
       return [];
     }
 
-    console.log(`Found ${photoFiles.length} photos`);
+    console.log(`Found ${photoFiles.length} photos:`, photoFiles);
     const photos: Photo[] = [];
 
     for (const filename of photoFiles) {
@@ -140,16 +151,19 @@ export const loadPhotosFromRepo = async (): Promise<Photo[]> => {
       const fileDate = parseTimestampFromFilename(filename);
       
       if (!fileDate) {
-        console.warn(`Could not parse timestamp from filename: ${filename}`);
+        console.warn(`Could not parse timestamp from filename: ${filename}, skipping`);
         continue;
       }
 
       const location = extractLocationFromFilename(filename);
       const title = generateTitleFromFilename(filename);
+      const imagePath = '/photos/' + filename;
+      
+      console.log(`Processing photo: ${filename} -> ${imagePath}`);
       
       photos.push({
         id: filename,
-        src: '/photos/' + filename,
+        src: imagePath,
         alt: `${title}`,
         title,
         location,
@@ -162,10 +176,12 @@ export const loadPhotosFromRepo = async (): Promise<Photo[]> => {
     }
 
     // Sort by timestamp (newest first)
-    return photos.sort((a, b) => b.fileDate.getTime() - a.fileDate.getTime());
+    const sortedPhotos = photos.sort((a, b) => b.fileDate.getTime() - a.fileDate.getTime());
+    console.log('Final sorted photos:', sortedPhotos.map(p => ({ id: p.id, src: p.src })));
+    return sortedPhotos;
 
   } catch (error) {
-    console.error('Error loading photos from repository:', error);
+    console.error('Error loading photos from manifest:', error);
     return [];
   }
 };

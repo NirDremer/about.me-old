@@ -19,11 +19,11 @@ function App() {
       try {
         const photos = await loadAllPhotos();
         if (photos.length > 0) {
-          // Use the first (newest) photo as hero background
+          // Use the first (newest) photo from manifest as hero background
           setHeroImage(photos[0].src);
           setHasPhotos(true);
         } else {
-          // Use default background when no photos found
+          // Use default background when no photos found in manifest
           setHeroImage('/bg.jpg');
           setHasPhotos(false);
         }
@@ -41,9 +41,66 @@ function App() {
   // Calculate header transform based on scroll
   const headerTransform = Math.min(scrollY * 0.8, 400); // Max 400px upward movement
   const headerOpacity = Math.max(1 - scrollY / 300, 0); // Fade out over 300px
+  
+  // Calculate sticky header visibility
+  const showStickyHeader = scrollY > 400;
 
   return (
     <div className="bg-black text-white min-h-screen">
+      {/* Sticky Header */}
+      <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
+        showStickyHeader ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+      }`}>
+        <div className="bg-black/30 backdrop-blur-md border-b border-white/10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <h1 className="text-lg font-light tracking-wide text-white">
+                  NIR DREMER
+                </h1>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <a 
+                  href="mailto:hey@dremer.net" 
+                  className="text-gray-400 hover:text-white transition-colors duration-300"
+                  aria-label="Email"
+                >
+                  <Mail className="w-4 h-4" />
+                </a>
+                <a 
+                  href="https://twitter.com/nird" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-white transition-colors duration-300"
+                  aria-label="Twitter"
+                >
+                  <Twitter className="w-4 h-4" />
+                </a>
+                <a 
+                  href="https://www.linkedin.com/in/dremer/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-white transition-colors duration-300"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin className="w-4 h-4" />
+                </a>
+                <a 
+                  href="https://github.com/NirDremer" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-white transition-colors duration-300"
+                  aria-label="GitHub"
+                >
+                  <Github className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section with Background Image */}
       <div className="relative h-screen overflow-hidden">
         {/* Background Image */}
@@ -73,8 +130,8 @@ function App() {
               <h1 className="text-4xl sm:text-6xl md:text-8xl font-thin tracking-wide text-white mb-4 sm:mb-6">
                 NIR DREMER
               </h1>
-              <p className="text-lg sm:text-xl md:text-2xl font-light text-gray-200 max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8">
-                Product builder, investor, family guy & amateur photographer
+              <p className="text-base sm:text-lg md:text-xl font-light text-gray-200 max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8">
+                PRODUCT BUILDER, INVESTOR, FAMILY GUY & AMATEUR PHOTOGRAPHER
               </p>
               
               {/* Contact Links */}
@@ -123,19 +180,10 @@ function App() {
         </header>
 
         {/* Scroll indicator */}
-        {hasPhotos && (
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
-            <div className="animate-bounce">
-              <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-                <div className="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse"></div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Photo Gallery */}
-      <PhotoGallery />
+      {hasPhotos && <PhotoGallery excludeFirst={true} />}
 
       {/* Footer */}
       <footer className="bg-black/95 border-t border-gray-800">
