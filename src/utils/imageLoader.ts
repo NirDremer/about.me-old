@@ -98,7 +98,7 @@ const formatTime = (date: Date): string => {
 const loadPhotoManifest = async (): Promise<{ photos: string[], success: boolean }> => {
   try {
     console.log('Loading photo manifest...');
-    const response = await fetch('/photos/manifest.json');
+    const response = await fetch('./photos/manifest.json');
     if (!response.ok) {
       console.warn('Failed to load manifest:', response.status, response.statusText);
       return { photos: [], success: false };
@@ -157,7 +157,7 @@ export const loadPhotosFromRepo = async (): Promise<Photo[]> => {
 
       const location = extractLocationFromFilename(filename);
       const title = generateTitleFromFilename(filename);
-      const imagePath = '/photos/' + filename;
+      const imagePath = './photos/' + filename;
       
       console.log(`Processing photo: ${filename} -> ${imagePath}`);
       

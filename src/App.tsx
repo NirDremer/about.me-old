@@ -24,13 +24,13 @@ function App() {
           setHasPhotos(true);
         } else {
           // Use default background when no photos found in manifest
-          setHeroImage('/bg.jpg');
+          setHeroImage('./bg.jpg');
           setHasPhotos(false);
         }
       } catch (error) {
         console.error('Error loading hero image:', error);
         // Fallback to default background on error
-        setHeroImage('/bg.jpg');
+        setHeroImage('./bg.jpg');
         setHasPhotos(false);
       }
     };
