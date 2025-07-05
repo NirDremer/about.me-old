@@ -98,7 +98,10 @@ const formatTime = (date: Date): string => {
 const loadPhotoManifest = async (): Promise<{ photos: string[], success: boolean }> => {
   try {
     console.log('Loading photo manifest...');
-    const response = await fetch('./photos/manifest.json');
+    const baseUrl = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + '/';
+    const manifestUrl = baseUrl + 'photos/manifest.json';
+    console.log('Fetching manifest from:', manifestUrl);
+    const response = await fetch(manifestUrl);
     if (!response.ok) {
       console.warn('Failed to load manifest:', response.status, response.statusText);
       return { photos: [], success: false };
@@ -157,7 +160,8 @@ export const loadPhotosFromRepo = async (): Promise<Photo[]> => {
 
       const location = extractLocationFromFilename(filename);
       const title = generateTitleFromFilename(filename);
-      const imagePath = './photos/' + filename;
+      const baseUrl = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + '/';
+      const imagePath = baseUrl + 'photos/' + filename;
       
       console.log(`Processing photo: ${filename} -> ${imagePath}`);
       

@@ -24,13 +24,15 @@ function App() {
           setHasPhotos(true);
         } else {
           // Use default background when no photos found in manifest
-          setHeroImage('./bg.jpg');
+          const baseUrl = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + '/';
+          setHeroImage(baseUrl + 'bg.jpg');
           setHasPhotos(false);
         }
       } catch (error) {
         console.error('Error loading hero image:', error);
         // Fallback to default background on error
-        setHeroImage('./bg.jpg');
+        const baseUrl = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + '/';
+        setHeroImage(baseUrl + 'bg.jpg');
         setHasPhotos(false);
       }
     };
